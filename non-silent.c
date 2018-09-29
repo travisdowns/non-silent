@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include <err.h>
 
@@ -10,6 +11,13 @@ int cpu_ms() {
 }
 
 int main(int argc, char** argv) {
+
+    bool do_stores = false;
+    if (argc < 2 || strcmp(argv[1], "-s") == 0) {
+        do_stores = true;
+        argv++;
+        argc--;
+    }
     if (argc < 2) errx(EXIT_FAILURE, "provide the array size in KB on the command line");
 
     size_t size = atol(argv[1]) * 1024;
@@ -26,15 +34,24 @@ int main(int argc, char** argv) {
     while (cpu_ms() - startms < 500) {}
     startms = cpu_ms();
 
-    unsigned char sum = 0;
-    for (size_t off = 0; off < 64; off++) {
-        for (size_t i = 0; i < size; i += 64) {
-            sum += p[i + off];
+    if (do_stores) {
+        for (size_t off = 0; off < 64; off++) {
+            for (size_t i = 0; i < size; i += 64) {
+                p[i + off] = i;
+            }
         }
+        int delta = cpu_ms() - startms;
+        printf("stores done in %d ms \n", delta);
+    } else {
+        unsigned char sum = 0;
+        for (size_t off = 0; off < 64; off++) {
+            for (size_t i = 0; i < size; i += 64) {
+                sum += p[i + off];
+            }
+        }
+        int delta = cpu_ms() - startms;
+        printf("sum was %u in %d ms \n", sum, delta);
     }
-
-    int delta = cpu_ms() - startms;
-    printf("sum was %u in %d ms \n", sum, delta);
 
     return EXIT_SUCCESS;
 }
