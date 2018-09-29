@@ -1,0 +1,5 @@
+.vscode/
+non-silent
+*.o
+perf.data*
+results/*
