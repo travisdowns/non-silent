@@ -4,7 +4,7 @@ if [ -z $1 ]; then
 fi
 
 FILE=$1
-EVENTS="l2_lines_in.all l2_lines_out.silent l2_lines_out.non_silent"
+EVENTS=${EVENTS-"l2_lines_in.all l2_lines_out.silent l2_lines_out.non_silent l2_trans.l2_wb"}
 
 grepout() {
     egrep $1 $FILE | egrep -o "^[0-9]*"
@@ -19,4 +19,4 @@ done
 
 paste -d, *.tmpxx
 
-rm *.tmpxx
+rm *.tmpx
